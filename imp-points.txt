@@ -5,3 +5,5 @@ mongo_DB_pass: "UVvMogi4fUJEpKpX"
 
 2). there are two types of dependencies dev dependencies and dependency,
 dev dependency---> is type of dependency that is only used in development we don't take it in production.
+
+=> when a ascny function compleited then it will return a  promise 
