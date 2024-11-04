@@ -1,3 +1,6 @@
+mongo_DB_username: "mohandwivedi1806"
+mongo_DB_pass: "UVvMogi4fUJEpKpX"
+
 1). in js there are two ways of impoting common js, and modules in this project we make consistency so we use modules 
 
 2). there are two types of dependencies dev dependencies and dependency,
