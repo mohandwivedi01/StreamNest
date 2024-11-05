@@ -22,12 +22,12 @@ const registerUser = asyncHandler( async (req, res) => {
 
     //destructure the req body
     const {fullName, email, username, password} = req.body;
-    console.log(fullName, "\n", email, "\n", username, "\n", password);
+    // console.log(fullName, "\n", email, "\n", username, "\n", password);
     if(fullName=== ""&&email===null&&username===null&&password===null){
         throw new ApiError("All fields are required", 400)
     }
 
-    const existedUser = User.findOne(
+    const existedUser = await User.findOne(
         {$or: [{username},{email}]}
     )
     
@@ -40,17 +40,25 @@ const registerUser = asyncHandler( async (req, res) => {
     //multer gives use the access of req.files 
     //req.files? ==> may or may not present
     //req.files?.avtar[0] objects first property gives us path
-    const avatarLocalPath = req.files?.avtar[0]?.path
-    const coverImageLocalPath = req.files?.coverImage[0]?.path
+    const avatarLocalPath = req.files?.avatar[0]?.path
+    // const coverImageLocalPath = req.files?.coverImage[0]?.path
+    let coverImageLocalPath;
+    if(req.files && Array.isArray(req.files.coverImage) && req.files.length>0){
+        coverImageLocalPath = REQ.files.coverImage[0].path
+    }
+
 
     if(!avatarLocalPath){
-        throw new ApiError("Avatar image is required", 400)
+        throw new ApiError(400, "Avatar image is required")
     }
 
     const avatar = await uploadOnCloudinary(avatarLocalPath)
     const coverImage = await uploadOnCloudinary(coverImageLocalPath)
 
-    if(!avatar) throw new ApiError("Avatar image is required", 400);
+    if(!avatar) {
+        throw new ApiError( 400, "Avatar image is required");
+    }
+
 
     const user = await User.create({
         fullName,
@@ -58,7 +66,7 @@ const registerUser = asyncHandler( async (req, res) => {
         coverImage: coverImage.url || "",
         email,
         password,
-        username: username.toLowerCase,
+        username: username.toLowerCase(),
     })
 
     const createdUser = await User.findById(user._id).select("-password -refreshToken")
@@ -67,9 +75,9 @@ const registerUser = asyncHandler( async (req, res) => {
         throw new ApiError("somthing went wrong while creating user", 500)
     }
 
-    return res.statud(201).json({
-        new :ApiResponse(200, createdUser, "user registered successfully")
-    })
+    return res.status(201).json(
+        new ApiResponse(200, createdUser, "user registered successfully")
+    )
 })
 
 export {registerUser};
