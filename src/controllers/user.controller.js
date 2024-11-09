@@ -466,9 +466,10 @@ export {
     refreshAccessToken,
     changeCurrentPassword,
     getCurrentUser,
+    updateAccountDetails,
     updateUserAvatar,
     updateCoverImage,
     getUserChannelProfile,
     getWatchHistory,
-    
+
 };
