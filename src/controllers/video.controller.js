@@ -13,7 +13,7 @@ const publishAVideo = asyncHandler(async(req, res) => {
      * if video uploaded successfully then remove it from local storage and return success
      * if uploading failed then remove video from local file and return failure 
      */
-
+    // const {title, description } 
     const videoLocalPath = req.file?.path
 
     if(!videoLocalPath){
@@ -26,6 +26,8 @@ const publishAVideo = asyncHandler(async(req, res) => {
         throw new ApiError(400, "somthing went wrong while uploading video, please try again!")
     }
     const user = await User.fineBy
+
+
 })
 
 const getAllVideos = asyncHandler(async(req, res) => {
