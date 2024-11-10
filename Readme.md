@@ -1,24 +1,24 @@
 
-# VidTweet Schema
+# StreamNest Schema
 
 ![alt text](diagram-export-9-29-2024-7_18_21-PM.png)
 
 ---
 
-# VidTweet - Backend System  
+# StreamNest - Backend System  
 A backend system combining features of **YouTube** and **Twitter** to support video-based tweets with social interaction functionalities.
 
 ---
 
 ## Project Concept  
-VidTweet provides a platform where users can share video-based tweets and engage through comments, likes, and interactions.
+StreamNest provides a platform where users can share video-based tweets and engage through comments, likes, and interactions.
 
 ---
 
 ## Features  
 
 ### 1. User Authentication  
-- Secure **JWT-based login** and **email verification** for user access.  
+- Secure **JWT-based login** for user access.  
 
 ### 2. Content Management  
 - Handles **video uploads**, tweets, and **file attachments** efficiently.  
@@ -65,8 +65,8 @@ VidTweet provides a platform where users can share video-based tweets and engage
 ## How to Run  
 1. Clone the repository:  
    ```bash
-   git clone https://github.com/Zaheer872004/VidTweet.git
-   cd VidTweet
+   git clone https://github.com/Zaheer872004/StreamNest.git
+   cd StreamNest
    npm i 
 
 
