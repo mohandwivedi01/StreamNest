@@ -1,7 +1,6 @@
 
 # StreamNest Schema
-
-![alt text](diagram-export-9-29-2024-7_18_21-PM.png)
+![diagram-export-9-29-2024-7_18_21-PM](https://github.com/user-attachments/assets/954a42e0-5741-4773-b3ec-3dfc70dfcfad)
 
 ---
 
