@@ -13,7 +13,7 @@ import router from "./user.routes.js";
 
 const route = Router();
 
-route.use(verify) // Apply verifyJWT middleware to all routes in this file
+route.use(verifyJWT) // Apply verifyJWT middleware to all routes in this file
 
 router.route("/create-playlist").post(createPlaylist);
 router.route("/get-playlist/:playlistId").get(getPlaylistById);
