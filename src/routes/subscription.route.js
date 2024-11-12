@@ -9,8 +9,8 @@ import {
 const router = Router();
 router.use(verifyJWT); // Apply verifyJWT middleware to all routes in this file
 
-router.route("/get-subscribed-channels/:channelId").get(getSubscribedChannels);
 router.route("/toggle-subscription/:channelId").post(toggleSubscription);
-router.route("/get-subscribers").get(getUserChannelSubscribers)
+router.route("/get-subscribers/:channelId").get(getUserChannelSubscribers)
+router.route("/get-subscribed-channels/:subscriberId").get(getSubscribedChannels);
 
 export default router

@@ -342,6 +342,11 @@ const getUserChannelProfile = asyncHandler(async(req, res) => {
         throw new ApiError(400, "Username is missing")
     }
     //the value we get in return from aggregation is an array
+    /*
+    {
+        $unwind: "$subscribers" // Unwind the array to access subscriber details directly
+    }
+     */
     const channel = await User.aggregate([
         {
             $match: {

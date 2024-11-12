@@ -1,34 +1,31 @@
 import mongoose, { isValidObjectId } from "mongoose";
 import {Tweet} from "../models/tweet.model.js";
-import {User} from "../models/user.model.js";
 import {ApiError} from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
 
 const createTweet = asyncHandler(async (req, res) =>{
+    
     const {content} = req.body;
-
+    
     if(!content){
         throw ApiError(400, "content is missing!")
     }
-
-    const user = await req.u
-
+    
     const tweet = await Tweet.create(
         {
             content: content,
             owner: req.user?._id,
-        },
-        {
-            new: true
         }
     )
-
+    
     if(!tweet){
         throw new ApiError(400, "somthing went wrong!")
     }
 
+    console.log("tweet id: ",tweet?._id)
+    
     return res
     .status(200)
     .json(
@@ -53,7 +50,8 @@ const getUserTweets = asyncHandler(async (req, res) => {
             $lookup: {
                 from: "users",
                 localField: "$owner",
-                                
+                foreignField: "#_id",
+                as: ""                         
             }
         }
     ])
@@ -99,7 +97,6 @@ const updateTweet = asyncHandler(async (req, res)=>{
     )
 })
 
-
 const deleteTweet = asyncHandler(async (req, res)=>{
     const {tweetId} = req.params;
     if(!tweetId){
@@ -109,7 +106,8 @@ const deleteTweet = asyncHandler(async (req, res)=>{
     if(!tweet){
         throw new ApiError(400, "tweet not found please provide correct tweet id");
     }
-    if(req.user?._id.toString() !== Tweet.owner?.toString()){
+
+    if(req.user?._id.toString() !== tweet.owner?.toString()){
         throw new ApiError(400, "You are not authorized to delete this tweet")
     }
 
