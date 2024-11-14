@@ -30,6 +30,7 @@ const generateAccessAndRefreshToken = async(userId) => {
         throw new ApiError(500, "somthing went wrong while generating access and refresh token")
     }
 }
+
 const registerUser = asyncHandler( async (req, res) => {
     /* register user
     1). get user details from client 
@@ -57,7 +58,7 @@ const registerUser = asyncHandler( async (req, res) => {
     )
     
     if(existedUser){
-        throw new ApiError("User already exists", 409)
+        throw new ApiError(400, "User already exists")
     }
 
     // upload images to cloudinary
@@ -72,19 +73,17 @@ const registerUser = asyncHandler( async (req, res) => {
         coverImageLocalPath = req.files.coverImage[0].path
     }
 
-    // console.log("****coverImageLocalPath: ", coverImageLocalPath)
     if(!avatarLocalPath){
         throw new ApiError(400, "Avatar image is required")
     }
 
     const avatar = await uploadOnCloudinary(avatarLocalPath)
-    // console.log("******avatar",avatar)
+    
     const coverImage = await uploadOnCloudinary(coverImageLocalPath)
     if(!avatar) {
         throw new ApiError( 400, "Avatar image is required");
     }
-    // console.log("avatar url",avatar.url)
-    // console.log("coverImage url",coverImage.url)
+    
 
     const user = await User.create({
         fullName,

@@ -124,9 +124,29 @@ const deleteTweet = asyncHandler(async (req, res)=>{
     )
 })
 
+const  getTweetsById = asyncHandler(async(req, res) => {
+    const {tweetId} = req.params;
+
+    if(!tweetId){
+        throw new ApiError(400, "tweet id is missing..")
+    }
+
+    //check if tweet exists
+    const tweet = await Tweet.findById(tweetId)
+    if (!tweet) {
+        throw new ApiError(404, "tweet not found..")
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, tweet, "tweet fetched successfully..")
+    )
+})
 export {
     createTweet,
     updateTweet,
     getUserTweets,
     deleteTweet,
+    getTweetsById
 }

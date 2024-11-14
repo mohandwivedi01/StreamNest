@@ -14,14 +14,13 @@ const publishAVideo = asyncHandler(async(req, res) => {
      * if uploading failed then remove video from local file and return failure 
      */
     const {title, description, isPublished } = req.body;
-
-    if(!title && !description && isPublished===undefined){
+    if(!title || !description || isPublished===undefined){
         throw new ApiError(400, "required fields are missing")
     }
-
-    if (!req.files || !videoLocalPath || !thumbnailLocalPath) {
-        throw new ApiError(400, "Video file or thumbnail is missing");
-    }
+    
+    // if (req.files && videoLocalPath && thumbnailLocalPath) {
+    
+    // }
 
     const videoLocalPath = req.files?.videoFile[0]?.path
     const thumbnailLocalPath = req.files?.thumbnail[0]?.path
@@ -67,13 +66,20 @@ const getAllVideos = asyncHandler(async(req, res) => {
 })
 
 const getVideoById = asyncHandler(async(req, res) => {
+    console.log("hello")
     const { videoId } = req.params
 
     if(!videoId){
         throw new ApiError(400, "video id is missing..");
     }
 
-    const getVideo = await Video.findByIdAndUpdate(
+    //check if video exists
+    const video = await Video.findById(videoId)
+    if (!video) {
+        throw new ApiError(404, "video not found..")
+    }
+
+    const updateView = await Video.findByIdAndUpdate(
         videoId,
         {
             $inc: { views: 1 },
@@ -83,59 +89,83 @@ const getVideoById = asyncHandler(async(req, res) => {
         }
     );
     
-    if(!getVideo){
+    if(!updateVideo){
         throw new ApiError(404, "video is not found..");
     }
 
     return res
     .status(200)
     .json(
-        new ApiResponse(200, getVideo, "video fatched sunccessfully")
+        new ApiResponse(200, video, "video fatched sunccessfully")
     )
 })
 
-const updateVideo = asyncHandler(async(req, res) => {
-    const {videoId} = req.params
-    if(!videoId){
-        throw new ApiError(400, "Video id is missing..");
+const updateVideo = asyncHandler(async (req, res) => {
+    const { videoId } = req.params;
+    const { title, description } = req.body;
+
+    // Validate videoId
+    if (!videoId) {
+        throw new ApiError(400, "Video ID is missing.");
     }
 
-    if(!req.file || !req.file.thumbnail){
-        throw new ApiError(400, "thumbnail is missing..")
+    // Check if video exists
+    const video = await Video.findById(videoId);
+    if (!video) {
+        throw new ApiError(404, "Video not found.");
     }
 
-    const thumbnailLocalPath = req.file?.thumbnail[0]?.path
-
-    if(!thumbnailLocalPath){
-        throw new ApiError(400, "something went wrong thumbnail is not uploaded..");
+    // Check if the user is authorized to update the video
+    if (video.owner.toString() !== req.user._id.toString()) {
+        throw new ApiError(401, "You are not authorized to update this video.");
     }
 
-    const thumbnailUploaded = await uploadOnCloudinary(thumbnailLocalPath);
+    // If a new thumbnail is provided, upload it to Cloudinary
+    let thumbnailUrl = video.thumbnail; // Default to existing thumbnail   
 
-    if(!thumbnailUploaded.url){
-        throw new ApiError(400, "something went wrong thumbnail is not update..")
+    if (req.files && req.files.thumbnail) {
+        const thumbnailLocalPath = req.files.thumbnail[0]?.path;
+
+        if (!thumbnailLocalPath) {
+            throw new ApiError(400, "Thumbnail is not uploaded correctly.");
+        }
+
+        const thumbnailUploaded = await uploadOnCloudinary(thumbnailLocalPath);
+
+        if (!thumbnailUploaded.url) {
+            throw new ApiError(500, "Failed to upload the thumbnail.");
+        }
+
+        thumbnailUrl = thumbnailUploaded.url; // Set to new thumbnail URL
+    }else{
+        throw new ApiError(500, "somthing went wrong..")
     }
 
-    const videoThumbnailUpdated = await Video.findByIdAndUpdate(
+    // Update the video document
+    const updatedVideo = await Video.findByIdAndUpdate(
         videoId,
         {
-            thumbnail: thumbnailUploaded.url
+            ...(title && { title }), // Update only if provided
+            ...(description && { description }),
+            thumbnail: thumbnailUrl, // Always set thumbnail (existing or new)
         },
-        {
-            new: true
-        }
-    )
+        { new: true }
+    );
 
-    if(!videoThumbnailUpdated){
-        throw new ApiError(400, "something went wrong..");
+    if (!updatedVideo) {
+        throw new ApiError(500, "Failed to update the video.");
     }
 
+    // Return success response
     return res
-    .status(200)
-    .json(
-        new ApiResponse(200, videoThumbnailUpdated, "thumbnal updated successfully")
-    )
-})
+        .status(200)
+        .json(
+            new ApiResponse(200, updatedVideo, "Video updated successfully.")
+        );
+});
+
+
+//****now videos deleting only from DB and remain on cloudinary need to modify api to delete on cloudinary also****
 
 const deleteVideo = asyncHandler(async(req, res) => {
     const { videoId } = req.params
@@ -143,16 +173,27 @@ const deleteVideo = asyncHandler(async(req, res) => {
     if(!videoId){
         throw new ApiError(400, "video id is missing..");
     }
+
+    //check if video exists
+    const video = await Video.findById(videoId)
+    if (!video) {
+        throw new ApiError(404,"video not found..")
+    }
+
+    //check user is authorized to delete video
+    if (video.owner.toString() !== req.user._id.toString()) {
+        throw new ApiError(401, "you are not authorized..")
+    }
     
-    const video = await Video?.findByIdAndDelete(videoId)
-    if(!video){
+    const deletedVideo = await Video?.findByIdAndDelete(videoId)
+    if(!deletedVideo){
         throw new ApiError(400, "somwthing went wrong..")
     }
 
     return res
-    .status
+    .status(200)
     .json(
-        new ApiResponse(200, video, "Video deleted successfully..")
+        new ApiResponse(200, deletedVideo, "video deleted successfully..")
     )
 })
 
@@ -162,11 +203,23 @@ const togglePublishStatus = asyncHandler(async(req, res) => {
     if(!videoId){
         throw new ApiError(400, "video id is missing..");
     }   
+    //check if video is exist or not
+    const video = await Video.findById(videoId)
     
+    if (!video) {
+        throw new ApiError(404, "video not found..")
+    }
+
+    //check if you are autherized to toggle publish status
+    if(video.owner.toString() !== req.user._id.toString()){
+        throw new ApiError(401, "you are not autherized to update this video..")
+    }
+    
+    console.log("video status: ", video.isPublished)
     const toggledStatus = await Video.findByIdAndUpdate(
         videoId,
         {
-            isPublished: !Video.isPublished,
+            isPublished: !video.isPublished,
         },
         {
             new: true

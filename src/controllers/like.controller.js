@@ -1,6 +1,7 @@
 import mongoose, {isValidObjectId} from "mongoose"
 import {Like} from "../models/like.model.js"
 import {Tweet} from "../models/tweet.model.js"
+import {Comment} from "../models/comment.model.js"
 import {Video} from "../models/video.model.js"
 import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
@@ -12,13 +13,12 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
     if(!videoId){
         throw new ApiError(400, "video id is missing..");
     }
-
+    
     const video = await Video.findById(videoId)
-
     if(!video){
         throw new ApiError(400, "video is not exists..")
     }
-
+    
     const like = await Like.findOne(
         {
             video: videoId,
@@ -28,11 +28,11 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
             new: true
         }
     )
-
+    
     if(like){
         await Like.findByIdAndDelete(like._id);
     }else{
-        await Video.create(
+        await Like.create(
             {
                 video: videoId,
                 likedBy: req.user._id
@@ -43,20 +43,20 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
     return res
     .status(200)
     .json(
-        new ApiResponse(200, video, "video liked toggeled successfully..")
+        new ApiResponse(200, like, "video liked toggeled successfully..")
     )
 })
 
 const toggleCommentLike = asyncHandler(async (req, res) => {
-    const {commentId} = req.params
+    const {commentId} = req.params;
     //TODO: toggle like on comment
     if(!commentId){
-        throw new ApiError(400, "comment is missing..");
+        throw new ApiError(400, "comment id is missing..");
     }
 
     const comment = await Comment.findById(commentId);
     if(!comment){
-        throw new ApiError(400, "comment is not exists..");
+        throw new ApiError(404, "comment is not found..");
     }
 
     const like = await Like.findOne(
@@ -66,20 +66,17 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
         }
     )
 
-    try{
-        if(like){
-            await findByIdAndDelete(like._id)
-        }else{
-            await Like.create(
-                {
-                    comment: commentId,
-                    likedBy: req.user._id
-                }
-            )
-        }
-    }catch(error){
-        throw new ApiError(400, "somthing went wrong..")
+    if(like){
+        await Comment.findByIdAndDelete(like._id)
+    }else{
+        await Like.create(
+            {
+                comment: commentId,
+                likedBy: req.user._id
+            }
+        )
     }
+    
 
     return res
     .status(200)
@@ -99,7 +96,7 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
     const tweet = await Tweet.findById(tweetId);
 
     if(!tweet){
-        throw new ApiError(400,"tweet not found..")
+        throw new ApiError(404,"tweet not found..")
     }
 
     const like = await Tweet.findOne(
@@ -121,11 +118,11 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
             )
         }
     }catch{
-        throw new ApiError(400, "something went wrong..")
+        throw new ApiError(500, "something went wrong..")
     }
 
     return res
-    .status
+    .status(200)
     .json(
         new ApiResponse(200, tweet, "tweet like toggeled successfully..")
     )
@@ -222,9 +219,6 @@ const getLikedVideos = asyncHandler(async (req, res) => {
         new ApiResponse(200, likes, "liked videos fetched successfully")
     )
 })
-
-
-
 
 export {
     toggleCommentLike,

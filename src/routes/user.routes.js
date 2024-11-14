@@ -29,19 +29,20 @@ router.route("/register").post(upload.fields([
     }                              
 ]), registerUser)
 
-router.route("/login").post(loginUser)
 
 //secure routes
-router.route("/logout").post(verifyJWT, logoutUser)
-router.route("/refresh-token").post(refreshAccessToken)
-router.route("/change-password").post(verifyJWT, changeCurrentPassword)
+router.route("/channel/:username").get(verifyJWT, getUserChannelProfile)
+router.route("/watch-history").get(verifyJWT, getWatchHistory)
 router.route("/current-user").get(getCurrentUser)
+
+router.route("/login").post(loginUser)
+router.route("/logout").post(verifyJWT, logoutUser)
+router.route("/change-password").post(verifyJWT, changeCurrentPassword)
+router.route("/refresh-token").post(refreshAccessToken)
+
 router.route("/update-account").patch(verifyJWT, updateAccountDetails)
 router.route("/update-avatar").patch(verifyJWT, upload.single("avatar"), updateUserAvatar)
 router.route("/update-cover-image").patch(verifyJWT, upload.single("coverImage"), updateCoverImage)
-
-router.route("/channel/:username").get(verifyJWT, getUserChannelProfile)
-router.route("/watch-history").get(verifyJWT, getWatchHistory)
 
 
 
