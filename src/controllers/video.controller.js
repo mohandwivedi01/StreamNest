@@ -13,7 +13,7 @@ const publishAVideo = asyncHandler(async(req, res) => {
      * if video uploaded successfully then remove it from local storage and return success
      * if uploading failed then remove video from local file and return failure 
      */
-    const {title, description, isPublished } = req.body;
+    const {title, description, isPublished }  = req.body;
     if(!title || !description || isPublished===undefined){
         throw new ApiError(400, "required fields are missing")
     }
@@ -22,20 +22,23 @@ const publishAVideo = asyncHandler(async(req, res) => {
     
     // }
 
-    const videoLocalPath = req.files?.videoFile[0]?.path
-    const thumbnailLocalPath = req.files?.thumbnail[0]?.path
+    let videoUploaded;
+    let thumbnailUploaded;
+    if(req.files && req.files.videoFile && req.files.thumbnail){
+        const videoLocalPath = req.files?.videoFile[0]?.path
+        const thumbnailLocalPath = req.files?.thumbnail[0]?.path
 
-    if(!videoLocalPath && !thumbnailLocalPath){
-        throw new ApiError(400, "video file or thumbnail is missing")
+        if(!videoLocalPath && !thumbnailLocalPath){
+            throw new ApiError(400, "video file or thumbnail is missing")
+        }
+        videoUploaded = await uploadOnCloudinary(videoLocalPath)
+        thumbnailUploaded = await uploadOnCloudinary(thumbnailLocalPath)   
     }
-    
-    const videoUploaded = await uploadOnCloudinary(videoLocalPath)
-    const thumbnailUploaded = await uploadOnCloudinary(thumbnailLocalPath)
 
     if(!videoUploaded.url && !thumbnailUploaded.url){
         throw new ApiError(400, "somthing went wrong while uploading video, please try again!")
     }
-
+    
     const video = await Video.create(
         {
             videoFile: videoUploaded.url,
@@ -66,7 +69,6 @@ const getAllVideos = asyncHandler(async(req, res) => {
 })
 
 const getVideoById = asyncHandler(async(req, res) => {
-    console.log("hello")
     const { videoId } = req.params
 
     if(!videoId){
@@ -215,7 +217,6 @@ const togglePublishStatus = asyncHandler(async(req, res) => {
         throw new ApiError(401, "you are not autherized to update this video..")
     }
     
-    console.log("video status: ", video.isPublished)
     const toggledStatus = await Video.findByIdAndUpdate(
         videoId,
         {
