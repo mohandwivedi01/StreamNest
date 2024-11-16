@@ -66,24 +66,23 @@ const registerUser = asyncHandler( async (req, res) => {
     //multer gives use the access of req.files 
     //req.files? ==> may or may not present
     //req.files?.avtar[0] objects first property gives us path
-    const avatarLocalPath = req.files?.avatar[0]?.path
     // const coverImageLocalPath = req.files?.coverImage[0]?.path
-    let coverImageLocalPath;
-    if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length>0){
-        coverImageLocalPath = req.files.coverImage[0].path
-    }
+    let avatar;
+    let coverImage;
+    if(req.files && req.files.avatar && req.files.coverImage){
+        console.log("condition failed..")
+        const avatarLocalPath = req.files?.avatar[0]?.path
+        const coverImageLocalPath = req.files.coverImage[0].path
+        if(!avatarLocalPath || !coverImageLocalPath){
+            throw new ApiError(400, "Avatar and cover image is required")
+        }
 
-    if(!avatarLocalPath){
-        throw new ApiError(400, "Avatar image is required")
+        avatar = await uploadOnCloudinary(avatarLocalPath)
+        coverImage = await uploadOnCloudinary(coverImageLocalPath)
     }
-
-    const avatar = await uploadOnCloudinary(avatarLocalPath)
-    
-    const coverImage = await uploadOnCloudinary(coverImageLocalPath)
-    if(!avatar) {
-        throw new ApiError( 400, "Avatar image is required");
+    if(!avatar || !coverImage){
+        throw new ApiError(500, "Somthing went wrong..")
     }
-    
 
     const user = await User.create({
         fullName,

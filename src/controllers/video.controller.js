@@ -4,6 +4,7 @@ import {Video} from "../models/video.model.js"
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
+//tested------------------------------------------->
 const publishAVideo = asyncHandler(async(req, res) => {
     /**
      * check user is logged in
@@ -67,7 +68,7 @@ const publishAVideo = asyncHandler(async(req, res) => {
 const getAllVideos = asyncHandler(async(req, res) => {
     const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
 })
-
+//tested------------------------------------------->
 const getVideoById = asyncHandler(async(req, res) => {
     const { videoId } = req.params
 
@@ -101,7 +102,7 @@ const getVideoById = asyncHandler(async(req, res) => {
         new ApiResponse(200, video, "video fatched sunccessfully")
     )
 })
-
+//tested------------------------------------------->
 const updateVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params;
     const { title, description } = req.body;
@@ -168,7 +169,7 @@ const updateVideo = asyncHandler(async (req, res) => {
 
 
 //****now videos deleting only from DB and remain on cloudinary need to modify api to delete on cloudinary also****
-
+//tested------------------------------------------->
 const deleteVideo = asyncHandler(async(req, res) => {
     const { videoId } = req.params
 
@@ -198,7 +199,7 @@ const deleteVideo = asyncHandler(async(req, res) => {
         new ApiResponse(200, deletedVideo, "video deleted successfully..")
     )
 })
-
+//tested------------------------------------------->
 const togglePublishStatus = asyncHandler(async(req, res) => {
     const { videoId } = req.params
 
