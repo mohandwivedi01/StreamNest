@@ -7,6 +7,7 @@ import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
 
+// tested----------------------->
 const getChannelStats = asyncHandler(async (req, res) => {
     // TODO: Get the channel stats like total video views, total subscribers, total videos, total likes etc.
     
@@ -105,15 +106,8 @@ const getChannelStats = asyncHandler(async (req, res) => {
     }catch(error){
         throw new ApiError(500, `something went wrong, error: ${error}`)
     }
-    // totalViews = totalViews[0]
-    // console.log(req.user?._id) 
-    // console.log("total Videos: ", totalVideos)
-    // console.log("total Views: ", totalViews)
-    // console.log("total Subscribers: ", totalSubs)
-    // console.log("total video likes: ", totalVideoLikes)
-    // console.log("total tweet likes: ", totalTweetLikes)
 })
-
+// tested----------------------->
 const getChannelVideos = asyncHandler(async (req, res) => {
     // TODO: Get all the videos uploaded by the channel
     const {page=1, limit=20} = req.query

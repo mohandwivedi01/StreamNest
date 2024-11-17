@@ -7,6 +7,7 @@ import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
 
+// tested--------------------------------->
 const toggleVideoLike = asyncHandler(async (req, res) => {
     const {videoId} = req.params
     //TODO: toggle like on video
@@ -46,7 +47,7 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
         new ApiResponse(200, like, "video liked toggeled successfully..")
     )
 })
-
+// tested--------------------------------->
 const toggleCommentLike = asyncHandler(async (req, res) => {
     const {commentId} = req.params;
     //TODO: toggle like on comment
@@ -85,7 +86,7 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
     )
 
 })
-
+// tested--------------------------------->
 const toggleTweetLike = asyncHandler(async (req, res) => {
     const {tweetId} = req.params
     //TODO: toggle like on tweet
@@ -128,99 +129,7 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
     )
 })
 
-// const getLikedVideos = asyncHandler(async (req, res) => {
-//     //TODO: get all liked videos
-//     const likes = await Like.aggregate(
-//         [
-//             {
-//                 $match : {
-//                     likedBy : mongoose.Types.ObjectId(userId)
-//                 }
-//             },
-//             {
-//                 $lookup : {
-//                     from : "videos",
-//                     localField : "video",
-//                     foreignField : "_id",
-//                     as : "video",
-//                     pipeline : [
-//                         {
-//                             $lookup : {
-//                                 from : "users",
-//                                 localField : "owner",
-//                                 foreignField : "_id",
-//                                 as : "owner"
-//                             }
-//                         },
-//                         {
-//                             $addFields : {
-//                                 owner : {
-//                                     $first : "$owner"
-//                                 }
-//                             }
-//                         }
-//                     ]
-//                 }
-//             },
-//             {
-//                 $lookup : {
-//                     from : "users",
-//                     localField : "likedBy",
-//                     foreignField : "_id",
-//                     as : "likedBy",
-//                 }
-//             },
-//             {
-//                 $addFields : {
-//                     video : {
-//                         $first : "$video"
-//                     },
-//                     likedBy : {
-//                         $first : "$likedBy"
-//                     },
-//                     totalVideo : {
-//                         $size : "$video"
-//                     }
-//                 }
-//             },
-//             {
-//                 $project : {
-//                     video : {
-//                         title : 1,
-//                         description : 1,
-//                         videoFile : 1,
-//                         thumbnail : 1,
-//                         duration : 1,
-//                         views : 1,
-//                         isPublised : 1,
-//                         createdAt : 1,
-//                         updatedAt : 1,
-//                         owner : 1
-//                     },
-//                     likedBy : {
-//                         username : 1,
-//                         fullName : 1,
-//                         avatar : 1
-//                     },
-//                     totalVideo : 1
-//                 }
-//             }
-
-//         ]
-//     )
-
-//     if(likes.length===0){
-//         throw new ApiError(400, "something went wrong..")
-//     }
-    
-//     return res
-//     .status(200)
-//     .json(
-//         new ApiResponse(200, likes, "liked videos fetched successfully")
-//     )
-// })
-
-
+// tested--------------------------------->
 const getLikedVideos = asyncHandler(async (req, res) => {
     //TODO: get all liked videos
     try{

@@ -5,7 +5,7 @@ import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
 
-
+// tested--------------------------------->
 const toggleSubscription = asyncHandler(async (req, res) => {
     const {channelId} = req.params
     // TODO: toggle subscription
@@ -46,7 +46,7 @@ const toggleSubscription = asyncHandler(async (req, res) => {
         new ApiResponse(200, null, "channel subscription toggeled successfully..")
     )
 })
-
+// tested--------------------------------->
 // controller to return subscriber list of a channel
 const getUserChannelSubscribers = asyncHandler(async (req, res) => {
     const {channelId} = req.params
@@ -91,7 +91,7 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
     )
 })
 
-
+// tested--------------------------------->
 // controller to return channel list to which user has subscribed
 const getSubscribedChannels = asyncHandler(async (req, res) => {
     const { subscriberId } = req.params

@@ -33,7 +33,7 @@ const createTweet = asyncHandler(async (req, res) =>{
         new ApiResponse(200, tweet, "tweet created successfully")
     )
 })
-
+// tested--------------------------------->
 const getUserTweets = asyncHandler(async (req, res) => {
     const {userId} = req.params
     
@@ -46,7 +46,7 @@ const getUserTweets = asyncHandler(async (req, res) => {
     if(!user){
         throw new ApiError(404, "user not found..")
     }
-    
+
     const userTweets = await Tweet.find({owner:userId})
     if(!userTweets){
         throw new ApiResponse(500, "something went wrong..")

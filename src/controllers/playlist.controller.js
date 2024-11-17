@@ -166,7 +166,7 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
         new ApiResponse(200, removeVideo, "video removed from playlist..")
     )
 })
-
+// tested--------------------------------->
 const deletePlaylist = asyncHandler(async (req, res) => {
     const {playlistId} = req.params
     // TODO: delete playlist

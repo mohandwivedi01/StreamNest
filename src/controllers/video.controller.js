@@ -64,10 +64,80 @@ const publishAVideo = asyncHandler(async(req, res) => {
     )
 
 })
+/*Explanation of the Code
+Query Parameters:
 
-const getAllVideos = asyncHandler(async(req, res) => {
-    const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
-})
+page: The page number for pagination (default: 1).
+limit: The number of videos per page (default: 20).
+query: A search string for filtering videos by title or description.
+sortBy: The field to sort by (default: createdAt).
+sortType: The sorting order, asc for ascending or desc for descending (default: desc).
+userId: Filters videos owned by a specific user.
+Filter Object:
+
+$or: Allows searching by title or description using a case-insensitive regular expression.
+owner: Filters videos by the userId if provided.
+Pagination:
+
+skip: Skips the appropriate number of videos based on the page.
+limit: Limits the number of videos returned.
+Sorting:
+
+sort: Dynamically sorts by the specified field (sortBy) in the desired order (sortType).
+Response Structure:
+
+Includes the following:
+videos: Array of videos for the current page.
+totalVideos: Total number of videos matching the filters.
+totalPages: Total number of pages available.
+currentPage: The current page number.
+*/
+const getAllVideos = asyncHandler(async (req, res) => {
+    const { page = 1, limit = 20, query = "", sortBy = "createdAt", sortType = "desc", userId } = req.query;
+
+    // Convert page and limit to numbers
+    const pageNum = parseInt(page, 10);
+    const limitNum = parseInt(limit, 10);
+
+    // Build the filter object
+    const filter = {};
+
+    // Apply query filter for title or description (case-insensitive)
+    if (query) {
+        filter.$or = [
+            { title: { $regex: query, $options: "i" } },
+            { description: { $regex: query, $options: "i" } }
+        ];
+    }
+
+    // Filter by userId if provided
+    if (userId) {
+        filter.owner = userId;
+    }
+
+    // Convert sortType to numeric value (-1 for descending, 1 for ascending)
+    const sortOption = sortType === "asc" ? 1 : -1;
+
+    // Fetch videos with filters, pagination, and sorting
+    const videos = await Video.find( )
+        .sort({ [sortBy]: sortOption }) // Dynamic sorting
+        .skip((pageNum - 1) * limitNum) // Skip videos based on the page
+        .limit(limitNum); // Limit the number of videos returned
+
+    // Get the total count of videos matching the filters
+    const totalVideos = await Video.countDocuments(filter);
+
+    // Return paginated response
+    return res.status(200).json(
+        new ApiResponse(200, {
+            videos,
+            totalVideos,
+            totalPages: Math.ceil(totalVideos / limitNum),
+            currentPage: pageNum,
+        }, "Videos retrieved successfully.")
+    );
+});
+
 //tested------------------------------------------->
 const getVideoById = asyncHandler(async(req, res) => {
     const { videoId } = req.params
