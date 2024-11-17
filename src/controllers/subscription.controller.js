@@ -17,21 +17,33 @@ const toggleSubscription = asyncHandler(async (req, res) => {
     if (channelId.toString() === req.user._id.toString()) {
         throw new ApiError(400, "its not valid request..")
     }
-    const subscrib = await Subscription.create(
-        {
-            subscriber: req.user?._id,
-            channel: channelId
-        }
-    )
 
-    if(!subscrib){
-        throw new ApiError(400, "somthing went wrong, try again")
+    try{
+        const subscrib = await Subscription.findOne(
+            {
+                channel: channelId,
+                subscriber: req.user?._id         
+            }
+        )
+    
+        if(subscrib){
+            await Subscription.findByIdAndDelete(subscrib._id)
+        }else{
+            await Subscription.create(
+                {
+                    channel: channelId,
+                    subscriber: req.user?._id
+                }
+            )
+        }
+    }catch(error){    
+        throw new ApiError(400, `somthing went wrong, try again: ${error}`)
     }
 
     return res
     .status(200)
     .json(
-        new ApiResponse(200, null, "channel subscribed successfully")
+        new ApiResponse(200, null, "channel subscription toggeled successfully..")
     )
 })
 
