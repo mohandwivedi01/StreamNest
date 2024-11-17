@@ -11,7 +11,7 @@ const router = Router();
 
 router.use(verifyJWT); // Apply verifyJWT middleware to all routes in this file
 
-router.route("/get-liked-videos/:tweetId").get(getLikedVideos);
+router.route("/get-liked-videos").get(getLikedVideos);
 router.route("/toggle-video-like/:videoId").get(toggleVideoLike);
 router.route("/toggle-comment-like/:commentId").get(toggleCommentLike);
 router.route("/toggle-tweet-like/:tweetId").get(toggleTweetLike);

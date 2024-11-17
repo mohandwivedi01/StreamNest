@@ -1,4 +1,5 @@
 import {Playlist} from "../models/playlist.model.js"
+import { User } from "../models/user.model.js"
 import {Video} from "../models/video.model.js"
 import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
@@ -29,12 +30,34 @@ const createPlaylist = asyncHandler(async (req, res) => {
         new ApiResponse(200, playlist, "playlist created successfully..")
     )
 })
-
+//tested--------------------->
 const getUserPlaylists = asyncHandler(async (req, res) => {
     const {userId} = req.params
     //TODO: get user playlists
-})
 
+    //validate user id
+    if (!userId) {
+        throw new ApiError(400, "user id is missing..")
+    }
+
+    //check if user exist
+    const user = await User.findById(userId)
+    if(!user){
+        throw new ApiError(404, `user with id ${userId} is not found..`)
+    }
+
+    const playlists = await Playlist.find({owner: userId})
+    if (!playlists) {
+        throw new ApiError(500, "something went wrong..")
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, playlists, "playlists fetched successfully..")
+    )
+})
+//tested--------------------->
 const getPlaylistById = asyncHandler(async (req, res) => {
     const {playlistId} = req.params
     //TODO: get playlist by id

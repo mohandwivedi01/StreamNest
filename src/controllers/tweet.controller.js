@@ -3,8 +3,9 @@ import {Tweet} from "../models/tweet.model.js";
 import {ApiError} from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { User } from "../models/user.model.js";
 
-
+// tested----------------------------------->
 const createTweet = asyncHandler(async (req, res) =>{
     
     const {content} = req.body;
@@ -35,29 +36,30 @@ const createTweet = asyncHandler(async (req, res) =>{
 
 const getUserTweets = asyncHandler(async (req, res) => {
     const {userId} = req.params
-
+    
+    //validate user id
     if(!userId){
         throw new ApiError(400, "userId is missing"); 
     }
+    //check if user exists
+    const user = await User.findById(userId)
+    if(!user){
+        throw new ApiError(404, "user not found..")
+    }
+    
+    const userTweets = await Tweet.find({owner:userId})
+    if(!userTweets){
+        throw new ApiResponse(500, "something went wrong..")
+    }
 
-    const getUserTweets = await Tweet.aggregate([
-        {
-            $match: {
-                owner: mongoose.Types.ObjectId(userId)
-            }
-        },
-        {
-            $lookup: {
-                from: "users",
-                localField: "$owner",
-                foreignField: "#_id",
-                as: ""                         
-            }
-        }
-    ])
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, userTweets, "user tweets fetched successfully..")
+    )
 
 })
-
+// tested----------------------------------->
 const updateTweet = asyncHandler(async (req, res)=>{
     const { content } = req.body;
     const { tweetId } = req.params;
@@ -96,7 +98,7 @@ const updateTweet = asyncHandler(async (req, res)=>{
         new ApiResponse(200, response, "tweet updated successfully")
     )
 })
-
+// tested----------------------------------->
 const deleteTweet = asyncHandler(async (req, res)=>{
     const {tweetId} = req.params;
     if(!tweetId){
@@ -123,7 +125,7 @@ const deleteTweet = asyncHandler(async (req, res)=>{
         new ApiResponse(200, null, "Tweet deleted successfully")
     )
 })
-
+// tested----------------------------------->
 const  getTweetsById = asyncHandler(async(req, res) => {
     const {tweetId} = req.params;
 
